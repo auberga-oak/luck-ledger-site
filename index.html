@@ -1,5 +1,10 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Luck Ledger: one true luck story a week</title><meta name="description" content="One true luck story a week, the move behind it, and a 10-minute thing to try.">
+<link rel="canonical" href="https://catalysi.si/">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Luck Ledger"><meta property="og:url" content="https://catalysi.si/">
+<meta property="og:title" content="Luck Ledger: one true luck story a week"><meta property="og:description" content="One true luck story a week, the move behind it, and a 10-minute thing to try.">
+<meta property="og:image" content="https://catalysi.si/assets/og.png"><meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#fbf7ef"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/style.css"></head><body>
 <header><span class="logo">Luck Ledger</span><span class="tag">catalysi.si</span></header>
 <main>
@@ -7,7 +12,7 @@
 <h1>Luck leaves a paper trail.</h1>
 <p class="lead">Every week: one true story about someone who got lucky, the move that put them in luck's way, and one small thing you can try before lunch.</p>
 <!-- Kit inline form "Luck Ledger signup" (ID 10034030, double opt-in) -->
-<form class="signup" action="https://app.kit.com/forms/10034030/subscriptions" method="post">
+<form class="signup" id="signup" action="https://app.kit.com/forms/10034030/subscriptions" method="post">
 <input type="email" name="email_address" required placeholder="you@example.com" aria-label="Email address"><button type="submit">Send me the stories</button></form>
 <p id="msg" class="note">Free. One email a week, on Sundays. Check your inbox to confirm.</p>
 <p class="gdpr">We use your email only to send Luck Ledger, and the email tool stores it for us. Every email has an unsubscribe link, and you can ask us to delete your data at any time. Finansium AB is responsible for your data. <a href="privacy.html">Privacy notice</a>.</p>
@@ -25,4 +30,10 @@
 <section class="pack"><h2>Want all 33 moves?</h2>
 <p>The newsletter gives you one story a week. <i>A larger bucket</i> has all 33 moves, as 33 videos and a book.</p>
 <a class="btn" href="https://overwise.gumroad.com/l/moreluck" target="_blank" rel="noopener">Get A larger bucket</a></section>
-</main><footer>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer></body></html>
+</main>
+<script>
+document.getElementById('signup').addEventListener('submit',async e=>{e.preventDefault();const f=e.target,m=document.getElementById('msg'),b=f.querySelector('button');b.disabled=true;b.textContent='Sending…';
+try{const r=await fetch(f.action,{method:'POST',body:new FormData(f),headers:{Accept:'application/json'}});const j=await r.json();
+if(j.status==='success'){f.hidden=true;m.innerHTML='<b>Almost done. Check your inbox</b> and click the confirm link. (Look in spam if it isn\'t there in a minute.)';}
+else if(j.url){window.location=j.url;}else throw 0;}catch(_){f.submit();}});
+</script><footer>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer></body></html>
