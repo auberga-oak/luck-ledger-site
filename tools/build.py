@@ -54,18 +54,20 @@ if earlier:
             f'<a href="{e(i["source_url"])}">Source</a></span></li>'
         )
     out.append("</ul></section>")
+MOVES = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (root / "moves.md").read_text().splitlines() if re.match(r"^\d+\.", l)]
+STORIES = json.load(open(root / "data/stories.json"))
 covered = {i["move"]: i["number"] for i in issues}
 tiles = []
 for m in range(1, 34):
     if m in covered:
         tiles.append(
-            f'<a class="tile on" href="#issue-{covered[m]}" title="Move {m}: issue #{covered[m]}">{m}</a>'
+            f'<a class="tile on" href="moves/{m}.html" title="Move {m}: {e(MOVES[m-1])}">{m}</a>'
         )
     else:
-        tiles.append(f'<span class="tile" aria-hidden="true">{m}</span>')
+        tiles.append(f'<a class="tile" href="moves/{m}.html" title="Move {m}: {e(MOVES[m-1])}">{m}</a>')
 out.append(
     f'<section class="moves reveal"><h2>The 33 moves</h2>'
-    f'<p class="note">{len(covered)} of 33 covered so far. Each issue lights one up.</p>\n'
+    f'<p class="note">{len(covered)} of 33 covered in issues so far. Tap a move to see the true stories behind it.</p>\n'
     f'<div class="strip" role="list" aria-label="Moves covered in issues">{"".join(tiles)}</div></section>'
 )
 block = "<!-- ISSUES:START -->\n" + "\n".join(out) + "\n<!-- ISSUES:END -->"
@@ -73,3 +75,29 @@ p = root / "index.html"
 s = p.read_text()
 p.write_text(re.sub(r"<!-- ISSUES:START -->.*?<!-- ISSUES:END -->", lambda _: block, s, flags=re.S))
 print(f"built {len(issues)} public issue(s); moves covered: {sorted(covered)}")
+
+# Move pages: the Ledger
+(root / "moves").mkdir(exist_ok=True)
+withs = 0
+for m in range(1, 34):
+    ss = sorted([x for x in STORIES if x["move"] == m], key=lambda x: x["date"], reverse=True)
+    if ss: withs += 1
+    if ss:
+        body = "<ul class=\"stories\">" + "".join(
+            f'<li><b>{e(x["name"])}</b>: {e(x["title"])}<br>{e(x["why"])}<br>'
+            f'<span class="note">Source: <a href="{e(x["source_url"])}" rel="noopener">{e(x["source_name"])}</a>, {nice(x["date"])}</span></li>'
+            for x in ss) + "</ul>"
+    else:
+        body = '<p class="note">No stories here yet. When we find a true one with a name and a source, it goes here.</p>'
+    nav = (f'<a href="{m-1}.html">&larr; Move {m-1}</a> ' if m > 1 else "") + '<a href="../">All moves</a>' + (f' <a href="{m+1}.html">Move {m+1} &rarr;</a>' if m < 33 else "")
+    t = e(MOVES[m-1])
+    (root / f"moves/{m}.html").write_text(
+        f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
+        f'<title>Move {m}: {t} | Luck Ledger</title><meta name="description" content="True, sourced stories of people who got lucky by doing this: {t}.">'
+        f'<link rel="canonical" href="https://catalysi.si/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
+        f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Ledger</a><span class="tag">catalysi.si</span></header>'
+        f'<main id="main"><section><p class="kicker">Move {m} of 33</p><h1>{t}</h1>'
+        f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}'
+        f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
+        f'<footer>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer></body></html>\n')
+print(f"move pages: 33, with stories: {withs}")

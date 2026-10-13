@@ -27,3 +27,4 @@ a{color:#2f7a4f}:focus-visible{outline:3px solid #2f7a4f;outline-offset:3px}
 @keyframes pulse{0%{box-shadow:0 0 0 0 #2f7a4f80}100%{box-shadow:0 0 0 14px #2f7a4f00}}
 .pulse{animation:pulse 1.4s ease-out .8s 1}
 @media(prefers-reduced-motion:reduce){.pulse{animation:none}.yt img{transition:none}}
+.stories{padding-left:1.1em}.stories li{margin:0 0 1em}
