@@ -3,3 +3,5 @@ backlog.md
 launch-checklist.md
 screenshot.png
 launch/
+screenshots/
+tools/__pycache__/
