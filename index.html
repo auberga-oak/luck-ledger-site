@@ -6,28 +6,33 @@
 <meta property="og:image" content="https://catalysi.si/assets/og.png"><meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#fbf7ef"><link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="assets/style.css"></head><body>
-<header><span class="logo">Luck Ledger</span><span class="tag">catalysi.si</span></header>
-<main>
+<a class="skip" href="#main">Skip to content</a><header><span class="logo">Luck Ledger</span><span class="tag">catalysi.si</span></header>
+<main id="main">
 <section class="hero">
 <h1>Luck leaves a paper trail.</h1>
 <p class="lead">Every week: one true story about someone who got lucky, the move that put them in luck's way, and one small thing you can try before lunch.</p>
 <!-- Kit inline form "Luck Ledger signup" (ID 10034030, double opt-in) -->
 <form class="signup" id="signup" action="https://app.kit.com/forms/10034030/subscriptions" method="post">
-<input type="email" name="email_address" required placeholder="you@example.com" aria-label="Email address"><button type="submit">Send me the stories</button></form>
-<p id="msg" class="note">Free. One email a week, on Sundays. Check your inbox to confirm.</p>
+<input type="email" name="email_address" required placeholder="you@example.com" aria-label="Email address"><button type="submit" class="pulse">Send me the stories</button></form>
+<p id="msg" class="note"><b>Free, every Sunday at 08:00.</b> Check your inbox to confirm.</p>
 <p class="gdpr">We use your email only to send Luck Ledger, and the email tool stores it for us. Every email has an unsubscribe link, and you can ask us to delete your data at any time. Finansium AB is responsible for your data. <a href="privacy.html">Privacy notice</a>.</p>
 </section>
-<section class="how"><h2>How each issue works</h2>
+<section class="how reveal"><h2>How each issue works</h2>
 <ol>
 <li><b>The story.</b> Something that really happened, with the source linked so you can check it.</li>
 <li><b>The move.</b> Which of the 33 moves it shows, in one line.</li>
 <li><b>The 10-minute action.</b> One small thing to do this week.</li>
 </ol></section>
-<section class="sample"><h2>From issue #1</h2>
-<blockquote><p>At 7:30 on an ordinary Thursday, an older reseller in a Portland Goodwill picked up an old Lakers warm-up jacket and tossed it back. Quinn Brown, 19, grabbed it "in half a second." He paid about $3. It was the jacket Wilt Chamberlain wore in the 1972 NBA Finals, and Sotheby's sold it for $89,600.</p>
-<p class="move">Move 26: Know the field well enough to see the odd result.</p></blockquote>
+<!-- ISSUES:START -->
+<section class="latest reveal" id="issue-1"><p class="kicker">Latest · Issue #1 · 18 Oct 2026</p>
+<h2>The $3 jacket somebody else put back</h2><p>A 19-year-old paid $3 for a jacket another reseller tossed back. Sotheby&#x27;s sold it for $89,600.</p>
+<p class="move">Move <span class="count" data-to="26">26</span> of 33: Know the field well enough to see the odd result.</p>
+<a class="yt" href="https://youtu.be/1_9WK2hC2rw" target="_blank" rel="noopener" aria-label="Watch Henrik's video on move 26 on YouTube"><img src="https://i.ytimg.com/vi/1_9WK2hC2rw/hqdefault.jpg" alt="" width="480" height="270" loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span><span class="ytcap">Watch the video on this move</span></a>
 <p class="note">Source: <a href="https://www.wweek.com/culture/2026/07/20/wilt-chamberlain-jacket-found-by-portland-teenager-sells-for-89600/">Willamette Week</a></p></section>
-<section class="pack"><h2>Want all 33 moves?</h2>
+<section class="moves reveal"><h2>The 33 moves</h2><p class="note">1 of 33 covered so far. Each issue lights one up.</p>
+<div class="strip" role="list" aria-label="Moves covered in issues"><span class="tile" aria-hidden="true">1</span><span class="tile" aria-hidden="true">2</span><span class="tile" aria-hidden="true">3</span><span class="tile" aria-hidden="true">4</span><span class="tile" aria-hidden="true">5</span><span class="tile" aria-hidden="true">6</span><span class="tile" aria-hidden="true">7</span><span class="tile" aria-hidden="true">8</span><span class="tile" aria-hidden="true">9</span><span class="tile" aria-hidden="true">10</span><span class="tile" aria-hidden="true">11</span><span class="tile" aria-hidden="true">12</span><span class="tile" aria-hidden="true">13</span><span class="tile" aria-hidden="true">14</span><span class="tile" aria-hidden="true">15</span><span class="tile" aria-hidden="true">16</span><span class="tile" aria-hidden="true">17</span><span class="tile" aria-hidden="true">18</span><span class="tile" aria-hidden="true">19</span><span class="tile" aria-hidden="true">20</span><span class="tile" aria-hidden="true">21</span><span class="tile" aria-hidden="true">22</span><span class="tile" aria-hidden="true">23</span><span class="tile" aria-hidden="true">24</span><span class="tile" aria-hidden="true">25</span><a class="tile on" href="#issue-1" title="Move 26: issue #1">26</a><span class="tile" aria-hidden="true">27</span><span class="tile" aria-hidden="true">28</span><span class="tile" aria-hidden="true">29</span><span class="tile" aria-hidden="true">30</span><span class="tile" aria-hidden="true">31</span><span class="tile" aria-hidden="true">32</span><span class="tile" aria-hidden="true">33</span></div></section>
+<!-- ISSUES:END -->
+<section class="pack reveal"><h2>Want all 33 moves?</h2>
 <p>The newsletter gives you one story a week. <i>A larger bucket</i> has all 33 moves, as 33 videos and a book.</p>
 <a class="btn" href="https://overwise.gumroad.com/l/moreluck" target="_blank" rel="noopener">Get A larger bucket</a></section>
 </main>
@@ -36,4 +41,4 @@ document.getElementById('signup').addEventListener('submit',async e=>{e.preventD
 try{const r=await fetch(f.action,{method:'POST',body:new FormData(f),headers:{Accept:'application/json'}});const j=await r.json();
 if(j.status==='success'){f.hidden=true;m.innerHTML='<b>Almost done. Check your inbox</b> and click the confirm link. (Look in spam if it isn\'t there in a minute.)';}
 else if(j.url){window.location=j.url;}else throw 0;}catch(_){f.submit();}});
-</script><footer>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer></body></html>
+</script><script src="assets/motion.js" defer></script><footer><a class="quiet" href="https://overwise.gumroad.com/l/moreluck" target="_blank" rel="noopener">Get all 33 moves</a><br>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer></body></html>
