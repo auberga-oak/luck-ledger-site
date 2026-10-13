@@ -99,5 +99,5 @@ for m in range(1, 34):
         f'<main id="main"><section><p class="kicker">Move {m} of 33</p><h1>{t}</h1>'
         f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}'
         f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
-        f'<footer>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer></body></html>\n')
+        f'<footer>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n</body></html>\n')
 print(f"move pages: 33, with stories: {withs}")
