@@ -57,18 +57,20 @@ if earlier:
 MOVES = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (root / "moves.md").read_text().splitlines() if re.match(r"^\d+\.", l)]
 STORIES = json.load(open(root / "data/stories.json"))
 covered = {i["move"]: i["number"] for i in issues}
+storied = {x["move"] for x in STORIES}
 tiles = []
 for m in range(1, 34):
-    if m in covered:
-        tiles.append(
-            f'<a class="tile on" href="moves/{m}.html" title="Move {m}: {e(MOVES[m-1])}">{m}</a>'
-        )
-    else:
-        tiles.append(f'<a class="tile" href="moves/{m}.html" title="Move {m}: {e(MOVES[m-1])}">{m}</a>')
+    cls = "tile on" if m in covered else ("tile has" if m in storied else "tile")
+    tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Move {m}: {e(MOVES[m-1])}">{m}</a>')
+n_st = len(storied | set(covered))
+legend = (f"{n_st} of 33 moves already have a true, sourced story. The darker tiles have stories, so tap one to read them."
+          if n_st else "Tap a move to see the true stories behind it.")
+if covered:
+    legend += f" Green ones have had their own issue ({len(covered)} so far)."
 out.append(
     f'<section class="moves reveal"><h2>The 33 moves</h2>'
-    f'<p class="note">{len(covered)} of 33 covered in issues so far. Tap a move to see the true stories behind it.</p>\n'
-    f'<div class="strip" role="list" aria-label="Moves covered in issues">{"".join(tiles)}</div></section>'
+    f'<p class="note">{legend}</p>\n'
+    f'<div class="strip" role="list" aria-label="The 33 moves">{"".join(tiles)}</div></section>'
 )
 block = "<!-- ISSUES:START -->\n" + "\n".join(out) + "\n<!-- ISSUES:END -->"
 p = root / "index.html"
