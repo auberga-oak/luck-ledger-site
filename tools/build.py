@@ -91,15 +91,15 @@ for m in range(1, 34):
             for x in ss) + "</ul>"
     else:
         body = '<p class="note">No stories here yet. When we find a true one with a name and a source, it goes here.</p>'
-    nav = (f'<a href="{m-1}.html">&larr; Move {m-1}</a> ' if m > 1 else "") + '<a href="../">All moves</a>' + (f' <a href="{m+1}.html">Move {m+1} &rarr;</a>' if m < 33 else "")
+    nav = (f'<a href="{m-1}.html">&larr; Luck habit #{m-1}</a> ' if m > 1 else "") + '<a href="../">All luck habits</a>' + (f' <a href="{m+1}.html">Luck habit #{m+1} &rarr;</a>' if m < 33 else "")
     t = e(MOVES[m-1])
     (root / f"moves/{m}.html").write_text(
         f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
-        f'<title>Move {m}: {t} | Luck Ledger</title><meta name="description" content="True, sourced stories of people who got lucky by doing this: {t}.">'
+        f'<title>Luck habit #{m}: {t} | Luck Habits</title><meta name="description" content="True, sourced stories of people who got lucky by doing this: {t}.">'
         f'<link rel="canonical" href="https://luckhabits.com/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
-        f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Ledger</a><span class="tag">luckhabits.com</span></header>'
-        f'<main id="main"><section><p class="kicker">Move {m} of 33</p><h1>{t}</h1>'
+        f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Habits</a><span class="tag">luckhabits.com</span></header>'
+        f'<main id="main"><section><p class="kicker">Luck habit #{m} of 33</p><h1>{t}</h1>'
         f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}'
         f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
-        f'<footer>Luck Ledger is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n</body></html>\n')
+        f'<footer>Luck Habits is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n</body></html>\n')
 print(f"move pages: 33, with stories: {withs}")
