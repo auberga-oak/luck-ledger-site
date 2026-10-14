@@ -96,8 +96,8 @@ for m in range(1, 34):
     (root / f"moves/{m}.html").write_text(
         f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         f'<title>Move {m}: {t} | Luck Ledger</title><meta name="description" content="True, sourced stories of people who got lucky by doing this: {t}.">'
-        f'<link rel="canonical" href="https://catalysi.si/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
-        f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Ledger</a><span class="tag">catalysi.si</span></header>'
+        f'<link rel="canonical" href="https://luckhabits.com/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
+        f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Ledger</a><span class="tag">luckhabits.com</span></header>'
         f'<main id="main"><section><p class="kicker">Move {m} of 33</p><h1>{t}</h1>'
         f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}'
         f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
