@@ -17,16 +17,16 @@ if latest:
     out.append(
         f'<section class="latest reveal" id="issue-{L["number"]}"><p class="kicker">Latest {DOT} Issue #{L["number"]} {DOT} {nice(L["date"])}</p>\n'
         f'<h2>{e(L["title"])}</h2><p>{e(L["teaser"])}</p>\n'
-        f'<p class="move">Move <span class="count" data-to="{L["move"]}">{L["move"]}</span> of 33: {e(L["move_line"])}</p>'
+        f'<p class="move">Luck habit #<span class="count" data-to="{L["move"]}">{L["move"]}</span> of 33: {e(L["move_line"])}</p>'
     )
     if L.get("youtube"):
         y = e(L["youtube"])
         out.append(
             f'<a class="yt" href="https://youtu.be/{y}" target="_blank" rel="noopener" '
-            f'aria-label="Watch Henrik\'s video on move {L["move"]} on YouTube">'
+            f'aria-label="Watch Henrik\'s video on luck habit #{L["move"]} on YouTube">'
             f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="" width="480" height="270" '
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
-            f'<span class="ytcap">Watch the video on this move</span></a>'
+            f'<span class="ytcap">Watch the video on this luck habit</span></a>'
         )
     out.append(
         f'<p class="note">Source: <a href="{e(L["source_url"])}">{e(L["source_name"])}</a></p></section>'
@@ -34,12 +34,12 @@ if latest:
 elif not issues:
     out.append(
         f'<section class="sample reveal"><p class="kicker">First issue {DOT} Sunday 18 Oct {DOT} 08:00</p>\n'
-        '<h2>The $3 jacket somebody else put back</h2>\n'
+        '<h2>He bet $3 on a jacket someone put back</h2>\n'
         '<blockquote><p>At 7:30 on an ordinary Thursday, an older reseller in a Portland Goodwill '
         'picked up an old Lakers warm-up jacket and tossed it back. Quinn Brown, 19, grabbed it '
         '"in half a second." He paid about $3. It was the jacket Wilt Chamberlain wore in the 1972 '
         'NBA Finals, and Sotheby&#x27;s sold it for $89,600.</p>\n'
-        '<p class="move">Move 26: Know the field well enough to see the odd result.</p></blockquote>\n'
+        '<p class="move">Luck habit #26: Know the field well enough to see the odd result.</p></blockquote>\n'
         f'<p class="note">Source: <a href="https://www.wweek.com/culture/2026/07/20/'
         f'wilt-chamberlain-jacket-found-by-portland-teenager-sells-for-89600/">Willamette Week</a> '
         f'{DOT} Subscribe above and it lands in your inbox first.</p></section>'
@@ -49,28 +49,39 @@ if earlier:
     for i in earlier:
         out.append(
             f'<li id="issue-{i["number"]}"><b>#{i["number"]} {e(i["title"])}</b> '
-            f'<span class="mv">Move {i["move"]}</span><br>'
+            f'<span class="mv">Luck habit #{i["move"]}</span><br>'
             f'<span class="note">{nice(i["date"])} {DOT} {e(i["teaser"])} {DOT} '
             f'<a href="{e(i["source_url"])}">Source</a></span></li>'
         )
     out.append("</ul></section>")
 MOVES = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (root / "moves.md").read_text().splitlines() if re.match(r"^\d+\.", l)]
 STORIES = json.load(open(root / "data/stories.json"))
+VIDEOS = json.load(open(root / "data/videos.json"))
+if VIDEOS:
+    out.append('<section class="videos reveal"><h2>Watch the stories</h2>'
+               '<p class="note">Short videos from Henrik\'s YouTube channel, OverWise. Each one tells the true story behind a luck habit.</p>')
+    out.append('<ul class="vids">' + "".join(
+        f'<li><a class="vthumb" href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">'
+        f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/hqdefault.jpg" alt="{e(v["alt"])}" width="480" height="270" loading="lazy" decoding="async"></a>'
+        f'<b>{e(v["title"])}</b>'
+        f'<span class="note"><a class="mv" href="moves/{v["move"]}.html">Luck habit #{v["move"]}</a> {DOT} '
+        f'<a href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">Watch on YouTube</a></span></li>'
+        for v in VIDEOS) + '</ul></section>')
 covered = {i["move"]: i["number"] for i in issues}
-storied = {x["move"] for x in STORIES}
+storied = {x["move"] for x in STORIES} | {v["move"] for v in VIDEOS}
 tiles = []
 for m in range(1, 34):
     cls = "tile on" if m in covered else ("tile has" if m in storied else "tile")
-    tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Move {m}: {e(MOVES[m-1])}">{m}</a>')
+    tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Luck habit #{m}: {e(MOVES[m-1])}">{m}</a>')
 n_st = len(storied | set(covered))
-legend = (f"{n_st} of 33 moves already have a true, sourced story. The darker tiles have stories, so tap one to read them."
-          if n_st else "Tap a move to see the true stories behind it.")
+legend = (f"{n_st} of 33 already have a true, sourced story. Habits #16 to #22 are about risk. The darker tiles have stories, so tap one to read them."
+          if n_st else "Tap a luck habit to see the true stories behind it.")
 if covered:
     legend += f" Green ones have had their own issue ({len(covered)} so far)."
 out.append(
-    f'<section class="moves reveal"><h2>The 33 moves</h2>'
+    f'<section class="moves reveal"><h2>The 33 luck habits</h2>'
     f'<p class="note">{legend}</p>\n'
-    f'<div class="strip" role="list" aria-label="The 33 moves">{"".join(tiles)}</div></section>'
+    f'<div class="strip" role="list" aria-label="The 33 luck habits">{"".join(tiles)}</div></section>'
 )
 block = "<!-- ISSUES:START -->\n" + "\n".join(out) + "\n<!-- ISSUES:END -->"
 p = root / "index.html"
@@ -89,6 +100,18 @@ for m in range(1, 34):
             f'<li><b>{e(x["name"])}</b>: {e(x["title"])}<br>{e(x["why"])}<br>'
             f'<span class="note">Source: <a href="{e(x["source_url"])}" rel="noopener">{e(x["source_name"])}</a>, {nice(x["date"])}</span></li>'
             for x in ss) + "</ul>"
+    vs = [v for v in VIDEOS if v["move"] == m]
+    if vs and not ss: withs += 1
+    if vs:
+        vbody = '<h2>Watch</h2><ul class="stories">' + "".join(
+            f'<li><b>{e(v["title"])}</b><br><a href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">Watch on YouTube</a></li>'
+            for v in vs) + "</ul>"
+    else:
+        vbody = ""
+    if ss:
+        pass
+    elif vs:
+        body = ""
     else:
         body = '<p class="note">No stories here yet. When we find a true one with a name and a source, it goes here.</p>'
     nav = (f'<a href="{m-1}.html">&larr; Luck habit #{m-1}</a> ' if m > 1 else "") + '<a href="../">All luck habits</a>' + (f' <a href="{m+1}.html">Luck habit #{m+1} &rarr;</a>' if m < 33 else "")
@@ -99,7 +122,7 @@ for m in range(1, 34):
         f'<link rel="canonical" href="https://luckhabits.com/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
         f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Habits</a><span class="tag">luckhabits.com</span></header>'
         f'<main id="main"><section><p class="kicker">Luck habit #{m} of 33</p><h1>{t}</h1>'
-        f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}'
+        f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}{vbody}'
         f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
         f'<footer>Luck Habits is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n</body></html>\n')
 print(f"move pages: 33, with stories: {withs}")
