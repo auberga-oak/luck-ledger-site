@@ -29,3 +29,5 @@ a{color:#2f7a4f}:focus-visible{outline:3px solid #2f7a4f;outline-offset:3px}
 .pulse{animation:pulse 1.4s ease-out .8s 1}
 @media(prefers-reduced-motion:reduce){.pulse{animation:none}.yt img{transition:none}}
 .stories{padding-left:1.1em}.stories li{margin:0 0 1em}
+@media(max-width:560px){.strip{grid-template-columns:repeat(7,1fr);gap:8px}.tile{font-size:15px}}
+.tile{text-decoration:none}
