@@ -57,10 +57,11 @@ if earlier:
 MOVES = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (root / "moves.md").read_text().splitlines() if re.match(r"^\d+\.", l)]
 STORIES = json.load(open(root / "data/stories.json"))
 VIDEOS = json.load(open(root / "data/videos.json"))
+vsec = []
 if VIDEOS:
-    out.append('<section class="videos reveal"><h2>Watch the stories</h2>'
+    vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
                '<p class="note">Short videos from Henrik\'s YouTube channel, OverWise. Each one tells the true story behind a luck habit.</p>')
-    out.append('<ul class="vids">' + "".join(
+    vsec.append('<ul class="vids">' + "".join(
         f'<li><a class="vthumb" href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">'
         f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/hqdefault.jpg" alt="{e(v["alt"])}" width="480" height="270" loading="lazy" decoding="async"></a>'
         f'<b>{e(v["title"])}</b>'
@@ -83,6 +84,7 @@ out.append(
     f'<p class="note">{legend}</p>\n'
     f'<div class="strip" role="list" aria-label="The 33 luck habits">{"".join(tiles)}</div></section>'
 )
+out.extend(vsec)
 block = "<!-- ISSUES:START -->\n" + "\n".join(out) + "\n<!-- ISSUES:END -->"
 p = root / "index.html"
 s = p.read_text()
