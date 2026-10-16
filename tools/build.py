@@ -64,7 +64,7 @@ if VIDEOS:
                '<p class="note">Short videos from Henrik\'s YouTube channel, OverWise. Each one tells the true story behind a luck habit.</p>')
     vsec.append('<ul class="vids">' + "".join(
         f'<li><a class="vthumb" href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">'
-        f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/hqdefault.jpg" alt="{e(v["alt"])}" width="480" height="270" loading="lazy" decoding="async"></a>'
+        f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/hqdefault.jpg" alt="{e(v["alt"])}" width="480" height="270" loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span></a>'
         f'<b>{e(v["title"])}</b>'
         f'<span class="note"><a class="mv" href="moves/{v["move"]}.html">Luck habit #{v["move"]}</a> {DOT} '
         f'<a href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">Watch on YouTube</a></span></li>'

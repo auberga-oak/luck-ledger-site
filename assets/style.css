@@ -33,7 +33,8 @@ a{color:#2f7a4f}:focus-visible{outline:3px solid #2f7a4f;outline-offset:3px}
 .tile{text-decoration:none}
 .vids{list-style:none;padding:0;margin:18px 0 0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:22px}
 .vids li{margin:0;display:flex;flex-direction:column;gap:6px;min-width:0}.vids b{font-size:18px;line-height:1.35}
-.vthumb{display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#e7dccb}
+.vthumb{position:relative;display:block;aspect-ratio:16/9;border-radius:8px;overflow:hidden;background:#e7dccb}
 .vthumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .3s}.vthumb:hover img{transform:scale(1.03)}
+.vthumb .play{width:48px;height:34px;margin:-17px 0 0 -24px;border-radius:9px}.vthumb .play:after{left:19px;top:9px;border-width:8px 0 8px 13px}
 .vids .mv{text-decoration:none}
 @media(prefers-reduced-motion:reduce){.vthumb img{transition:none}}
