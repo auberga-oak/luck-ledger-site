@@ -68,7 +68,8 @@ if VIDEOS:
         f'<b>{e(v["title"])}</b>'
         f'<span class="note"><a class="mv" href="moves/{v["move"]}.html">Luck habit #{v["move"]}</a> {DOT} '
         f'<a href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">Watch on YouTube</a></span></li>'
-        for v in VIDEOS) + '</ul></section>')
+        for v in VIDEOS) + '</ul>'
+        '<p class="note vcta">Want a new true story every Sunday? <a href="#signup">Get it by email</a>, free.</p></section>')
 covered = {i["move"]: i["number"] for i in issues}
 storied = {x["move"] for x in STORIES} | {v["move"] for v in VIDEOS}
 tiles = []

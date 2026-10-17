@@ -38,3 +38,4 @@ a{color:#2f7a4f}:focus-visible{outline:3px solid #2f7a4f;outline-offset:3px}
 .vthumb .play{width:48px;height:34px;margin:-17px 0 0 -24px;border-radius:9px}.vthumb .play:after{left:19px;top:9px;border-width:8px 0 8px 13px}
 .vids .mv{text-decoration:none}
 @media(prefers-reduced-motion:reduce){.vthumb img{transition:none}}
+.vcta{margin:24px 0 0;font-size:16px}.vcta a{font-weight:700;color:#2f7a4f;white-space:nowrap}#signup{scroll-margin-top:24px}
