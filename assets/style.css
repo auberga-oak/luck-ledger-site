@@ -39,3 +39,4 @@ a{color:#2f7a4f}:focus-visible{outline:3px solid #2f7a4f;outline-offset:3px}
 .vids .mv{text-decoration:none}
 @media(prefers-reduced-motion:reduce){.vthumb img{transition:none}}
 .vcta{margin:24px 0 0;font-size:16px}.vcta a{font-weight:700;color:#2f7a4f;white-space:nowrap}#signup{scroll-margin-top:24px}
+.nextup{margin-top:14px;padding-top:12px;border-top:1px dashed #d9cdb8}.nextup a{font-weight:700;color:#2f7a4f;white-space:nowrap}

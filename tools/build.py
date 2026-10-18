@@ -28,8 +28,10 @@ if latest:
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
             f'<span class="ytcap">Watch the video on this luck habit</span></a>'
         )
+    nxt = (datetime.date.fromisoformat(L["date"]) + datetime.timedelta(days=7)).strftime("%A %-d %b")
     out.append(
-        f'<p class="note">Source: <a href="{e(L["source_url"])}">{e(L["source_name"])}</a></p></section>'
+        f'<p class="note">Source: <a href="{e(L["source_url"])}">{e(L["source_name"])}</a></p>\n'
+        f'<p class="note nextup">Next story: {nxt} at 08:00. <a href="#signup">Get it by email</a>, free.</p></section>'
     )
 elif not issues:
     out.append(
