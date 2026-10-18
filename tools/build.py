@@ -3,6 +3,7 @@
 Only issues with public:true are shown (flip after the Kit broadcast goes out).
 Keep unpublished drafts OUT of issues.json (the repo is public), or leave public:false."""
 import json, html, re, datetime, pathlib
+from zoneinfo import ZoneInfo
 root = pathlib.Path(__file__).resolve().parent.parent
 issues = [i for i in json.load(open(root / "data/issues.json")) if i.get("public") is True]
 issues.sort(key=lambda i: i["number"], reverse=True)
@@ -28,10 +29,15 @@ if latest:
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
             f'<span class="ytcap">Watch the video on this luck habit</span></a>'
         )
-    nxt = (datetime.date.fromisoformat(L["date"]) + datetime.timedelta(days=7)).strftime("%A %-d %b")
+    # Rule: a new issue goes out every Sunday at 08:00 Stockholm local time (DST aware).
+    STHLM = ZoneInfo("Europe/Stockholm")
+    d0 = datetime.date.fromisoformat(L["date"])
+    nd = d0 + datetime.timedelta(days=(6 - d0.weekday()) % 7 or 7)  # next Sunday after the latest issue
+    nsend = datetime.datetime.combine(nd, datetime.time(8, 0), tzinfo=STHLM)
+    nxt = nsend.strftime("%A %-d %b at %H:%M")
     out.append(
         f'<p class="note">Source: <a href="{e(L["source_url"])}">{e(L["source_name"])}</a></p>\n'
-        f'<p class="note nextup">Next story: {nxt} at 08:00. <a href="#signup">Get it by email</a>, free.</p></section>'
+        f'<p class="note nextup">Next story: {nxt}. <a href="#signup">Get it by email</a>, free.</p></section>'
     )
 elif not issues:
     out.append(
@@ -57,7 +63,22 @@ if earlier:
             f'<a href="{e(i["source_url"])}">Source</a></span></li>'
         )
     out.append("</ul></section>")
-MOVES = [re.sub(r"^\d+\.\s*", "", l).strip() for l in (root / "moves.md").read_text().splitlines() if re.match(r"^\d+\.", l)]
+def load_moves():
+    """moves.md is local only (not committed). On a clean checkout fall back to the
+    habit names already in the committed moves/N.html pages."""
+    src = root / "moves.md"
+    if src.exists():
+        return [re.sub(r"^\d+\.\s*", "", l).strip() for l in src.read_text().splitlines() if re.match(r"^\d+\.", l)]
+    names = []
+    for m in range(1, 34):
+        mp = root / f"moves/{m}.html"
+        h = re.search(r"<h1>(.*?)</h1>", mp.read_text(), re.S) if mp.exists() else None
+        if not h:
+            raise SystemExit(f"moves.md missing and moves/{m}.html has no habit name; cannot build")
+        names.append(html.unescape(h.group(1)))
+    print("moves.md not found, using habit names from committed moves pages")
+    return names
+MOVES = load_moves()
 STORIES = json.load(open(root / "data/stories.json"))
 VIDEOS = json.load(open(root / "data/videos.json"))
 vsec = []
