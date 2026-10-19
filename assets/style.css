@@ -20,7 +20,7 @@ a{color:#2f7a4f}:focus-visible{outline:3px solid #2f7a4f;outline-offset:3px}
 .ytcap{position:absolute;left:0;right:0;bottom:0;padding:8px 12px;font:600 14px system-ui,sans-serif;color:#fff;background:linear-gradient(transparent,#000a)}
 .earlier ul{list-style:none;padding:0}.earlier li{padding:10px 0;border-top:1px solid #e7dccb}.mv{font:600 13px system-ui,sans-serif;color:#2f7a4f}
 .strip{display:grid;grid-template-columns:repeat(11,1fr);gap:6px;max-width:520px}
-.tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font:12px system-ui,sans-serif;color:#b3a692;border:1px solid #e7dccb;border-radius:4px;background:#fff}
+.tile{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font:12px system-ui,sans-serif;color:#b3a692;border:1px solid #958a7b;border-radius:4px;background:#fff}
 .tile.has{color:#2a241d;border-color:#2f7a4f;font-weight:700;text-decoration:none}
 .tile.on{background:#2f7a4f;border-color:#2f7a4f;color:#fff;font-weight:700;text-decoration:none}
 .quiet{color:#6f6559;text-decoration:underline;text-underline-offset:3px}
@@ -40,4 +40,4 @@ a{color:#2f7a4f}:focus-visible{outline:3px solid #2f7a4f;outline-offset:3px}
 @media(prefers-reduced-motion:reduce){.vthumb img{transition:none}}
 .vcta{margin:24px 0 0;font-size:16px}.vcta a{font-weight:700;color:#2f7a4f;white-space:nowrap}#signup{scroll-margin-top:24px}
 .nextup{margin-top:14px;padding-top:12px;border-top:1px dashed #d9cdb8}.nextup a{font-weight:700;color:#2f7a4f;white-space:nowrap}
-.key{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0 0;font-size:14px}.key span{display:inline-flex;align-items:center;gap:7px}.sw{display:inline-block;width:16px;height:16px;border-radius:3px;border:1px solid #e7dccb;background:#fff}.sw.has{border:2px solid #2f7a4f}.sw.on{background:#2f7a4f;border-color:#2f7a4f}
+.key{display:flex;flex-wrap:wrap;gap:6px 18px;margin:14px 0 0;font-size:14px}.key span{display:inline-flex;align-items:center;gap:7px}.sw{display:inline-block;width:16px;height:16px;border-radius:4px;border:1px solid #958a7b;background:#fff}.sw.has{border-color:#2f7a4f}.sw.on{background:#2f7a4f;border-color:#2f7a4f}

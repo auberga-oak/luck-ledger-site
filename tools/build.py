@@ -100,10 +100,8 @@ for m in range(1, 34):
     cls = "tile on" if m in covered else ("tile has" if m in storied else "tile")
     tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Luck habit #{m}: {e(MOVES[m-1])}">{m}</a>')
 n_st = len(storied | set(covered))
-legend = (f"{n_st} of 33 already have a true, sourced story. Habits #16 to #22 are about risk. The darker tiles have stories, so tap one to read them."
+legend = (f"{n_st} of 33 already have a true, sourced story. Habits #16 to #22 are about risk. Tap a tile with a story to read it."
           if n_st else "Tap a luck habit to see the true stories behind it.")
-if covered:
-    legend += f" Green ones have had their own issue ({len(covered)} so far)."
 key_items = ['<span><i class="sw"></i>No story yet</span>']
 if n_st:
     key_items.append('<span><i class="sw has"></i>Has a true story</span>')
