@@ -104,10 +104,17 @@ legend = (f"{n_st} of 33 already have a true, sourced story. Habits #16 to #22 a
           if n_st else "Tap a luck habit to see the true stories behind it.")
 if covered:
     legend += f" Green ones have had their own issue ({len(covered)} so far)."
+key_items = ['<span><i class="sw"></i>No story yet</span>']
+if n_st:
+    key_items.append('<span><i class="sw has"></i>Has a true story</span>')
+if covered:
+    key_items.append('<span><i class="sw on"></i>Had its own issue</span>')
+key = f'<p class="note key">{"".join(key_items)}</p>' if len(key_items) > 1 else ""
 out.append(
     f'<section class="moves reveal"><h2>The 33 luck habits</h2>'
     f'<p class="note">{legend}</p>\n'
-    f'<div class="strip" role="list" aria-label="The 33 luck habits">{"".join(tiles)}</div></section>'
+    f'<div class="strip" role="list" aria-label="The 33 luck habits">{"".join(tiles)}</div>'
+    f'{key}</section>'
 )
 out.extend(vsec)
 block = "<!-- ISSUES:START -->\n" + "\n".join(out) + "\n<!-- ISSUES:END -->"
