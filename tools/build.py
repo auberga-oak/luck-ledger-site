@@ -84,7 +84,7 @@ VIDEOS = json.load(open(root / "data/videos.json"))
 vsec = []
 if VIDEOS:
     vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
-               '<p class="note">Short videos from Henrik\'s YouTube channel, OverWise. Each one tells the true story behind a luck habit.</p>')
+               '<p class="note">Short videos from Henrik\'s YouTube channel, <a href="https://www.youtube.com/@OverWise-i9s" target="_blank" rel="noopener">OverWise</a>. Each one tells the true story behind a luck habit.</p>')
     vsec.append('<ul class="vids">' + "".join(
         f'<li><a class="vthumb" href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">'
         f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/hqdefault.jpg" alt="{e(v["alt"])}" width="480" height="270" loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span></a>'
