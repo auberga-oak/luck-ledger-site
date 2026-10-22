@@ -118,7 +118,15 @@ out.extend(vsec)
 block = "<!-- ISSUES:START -->\n" + "\n".join(out) + "\n<!-- ISSUES:END -->"
 p = root / "index.html"
 s = p.read_text()
-p.write_text(re.sub(r"<!-- ISSUES:START -->.*?<!-- ISSUES:END -->", lambda _: block, s, flags=re.S))
+rendered = re.sub(r"<!-- ISSUES:START -->.*?<!-- ISSUES:END -->", lambda _: block, s, flags=re.S)
+# data/site.json keeps the day the homepage last changed, for the sitemap lastmod.
+# It moves to today (Stockholm) only when this build changes index.html; no git needed.
+site_path = root / "data/site.json"
+SITE = json.load(open(site_path))
+if rendered != s:
+    SITE["home_updated"] = datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date().isoformat()
+    site_path.write_text(json.dumps(SITE, indent=2) + "\n")
+    p.write_text(rendered)
 print(f"built {len(issues)} public issue(s); moves covered: {sorted(covered)}")
 
 # Move pages: the Ledger
@@ -167,31 +175,12 @@ print(f"noindex: {[m for m in range(1, 34) if m not in has_story]}")
 # sitemap.xml: homepage, privacy notice and the move pages that have a story (same set as the tiles).
 # lastmod comes from the data, so a clean build always gives the same file.
 site_last = max([i["date"] for i in issues] + [x["date"] for x in STORIES])
-def home_last():
-    """Homepage lastmod: the latest of the issue and story dates and the day the homepage itself
-    last changed. If this build changes index.html (or build.py has uncommitted edits), that day is
-    today in Stockholm; otherwise it is the date of the last commit touching index.html or build.py.
-    Building, committing and rebuilding from a clean checkout on the same day gives the same date."""
-    import subprocess
-    STH = ZoneInfo("Europe/Stockholm")
-    def git(*a):
-        return subprocess.run(["git", "-C", str(root), *a], capture_output=True, text=True)
-    head = git("show", "HEAD:index.html")
-    dirty = git("status", "--porcelain", "--", "tools/build.py")
-    if head.returncode != 0:  # no git history (for example a tarball): data dates only
-        return site_last
-    if head.stdout != (root / "index.html").read_text() or dirty.stdout.strip():
-        changed = datetime.datetime.now(STH).date().isoformat()
-    else:
-        ct = git("log", "-1", "--format=%ct", "--", "index.html", "tools/build.py").stdout.strip()
-        changed = datetime.datetime.fromtimestamp(int(ct), STH).date().isoformat() if ct else site_last
-    return max(site_last, changed)
 def page_last(m):
     ds = [x["date"] for x in STORIES if x["move"] == m] + [i["date"] for i in issues if i["move"] == m]
     return max(ds) if ds else site_last
 pm = re.search(r"Last updated (\d+ \w+ \d{4})", (root / "privacy.html").read_text())
 priv_last = datetime.datetime.strptime(pm.group(1), "%d %B %Y").date().isoformat() if pm else site_last
-urls = [("https://luckhabits.com/", home_last()), ("https://luckhabits.com/privacy.html", priv_last)]
+urls = [("https://luckhabits.com/", max(site_last, SITE["home_updated"])), ("https://luckhabits.com/privacy.html", priv_last)]
 urls += [(f"https://luckhabits.com/moves/{m}.html", page_last(m)) for m in sorted(has_story)]
 (root / "sitemap.xml").write_text(
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
