@@ -18,7 +18,7 @@ if latest:
     out.append(
         f'<section class="latest reveal" id="issue-{L["number"]}"><p class="kicker">Latest {DOT} Issue #{L["number"]} {DOT} {nice(L["date"])}</p>\n'
         f'<h2>{e(L["title"])}</h2><p>{e(L["teaser"])}</p>\n'
-        f'<p class="move"><a href="moves/{L["move"]}.html">Luck habit #<span class="count" data-to="{L["move"]}">{L["move"]}</span></a> of 33: {e(L["move_line"])}</p>'
+        f'<p class="move"><a href="moves/{L["move"]}.html" aria-label="Luck habit #{L["move"]}">Luck habit #<span class="count" data-to="{L["move"]}">{L["move"]}</span></a> of 33: {e(L["move_line"])}</p>'
     )
     if L.get("youtube"):
         y = e(L["youtube"])
@@ -94,11 +94,15 @@ if VIDEOS:
         for v in VIDEOS) + '</ul></section>')
 covered = {i["move"]: i["number"] for i in issues}
 storied = {x["move"] for x in STORIES} | {v["move"] for v in VIDEOS}
+def has_content(m):
+    """One test for 'this habit has content': a story, a video or a public issue.
+    Tiles, noindex, the sitemap and the final check all use it."""
+    return m in storied or m in covered
 tiles = []
 for m in range(1, 34):
     cls = "tile on" if m in covered else ("tile has" if m in storied else "tile")
     tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Luck habit #{m}: {e(MOVES[m-1])}">{m}</a>')
-has_story = storied | set(covered)
+has_story = {m for m in range(1, 34) if has_content(m)}
 n_st = len(has_story)
 legend = (f"{n_st} of 33 already have a true, sourced story. Habits #16 to #22 are about risk. Tap a tile with a story to read it."
           if n_st else "Tap a luck habit to see the true stories behind it.")
@@ -121,16 +125,17 @@ s = p.read_text()
 rendered = re.sub(r"<!-- ISSUES:START -->.*?<!-- ISSUES:END -->", lambda _: block, s, flags=re.S)
 # data/site.json keeps the day the homepage last changed, for the sitemap lastmod.
 # It moves to today (Stockholm) only when this build changes index.html; no git needed.
+# Nothing is written until every page is built and checked (see the end of this file).
 site_path = root / "data/site.json"
 SITE = json.load(open(site_path))
+writes = {}
 if rendered != s:
     SITE["home_updated"] = datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date().isoformat()
-    site_path.write_text(json.dumps(SITE, indent=2) + "\n")
-    p.write_text(rendered)
+    writes[site_path] = json.dumps(SITE, indent=2) + "\n"
+    writes[p] = rendered
 print(f"built {len(issues)} public issue(s); moves covered: {sorted(covered)}")
 
 # Move pages: the Ledger
-(root / "moves").mkdir(exist_ok=True)
 withs = 0
 for m in range(1, 34):
     ss = sorted([x for x in STORIES if x["move"] == m], key=lambda x: x["date"], reverse=True)
@@ -148,17 +153,24 @@ for m in range(1, 34):
             for v in vs) + "</ul>"
     else:
         vbody = ""
+    iss = [i for i in issues if i["move"] == m]
     if ss:
         pass
     elif vs:
         body = ""
+    elif iss:  # a public issue is the only content: list it, linking to it on the homepage
+        withs += 1
+        body = "<ul class=\"stories\">" + "".join(
+            f'<li><b><a href="../#issue-{i["number"]}">Issue #{i["number"]}</a></b>: {e(i["title"])}<br>{e(i["teaser"])}<br>'
+            f'<span class="note">Source: <a href="{e(i["source_url"])}" rel="noopener">{e(i["source_name"])}</a>, {nice(i["date"])}</span></li>'
+            for i in iss) + "</ul>"
     else:
         body = '<p class="note">No stories here yet. When we find a true one with a name and a source, it goes here.</p>'
     nav = (f'<a href="{m-1}.html">&larr; Luck habit #{m-1}</a> ' if m > 1 else "") + '<a href="../">All luck habits</a>' + (f' <a href="{m+1}.html">Luck habit #{m+1} &rarr;</a>' if m < 33 else "")
     t = e(MOVES[m-1])
-    # Same test as the tile strip: a page with no story stays out of search results until it gets one.
-    robots = "" if m in has_story else '<meta name="robots" content="noindex, follow">'
-    (root / f"moves/{m}.html").write_text(
+    # Same test as the tile strip: a page with no content stays out of search results until it gets one.
+    robots = "" if has_content(m) else '<meta name="robots" content="noindex, follow">'
+    writes[root / f"moves/{m}.html"] = (
         f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         f'<title>Luck habit #{m}: {t} | Luck Habits</title><meta name="description" content="True, sourced stories of people who got lucky by doing this: {t}.">'
         f'{robots}<link rel="canonical" href="https://luckhabits.com/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
@@ -168,8 +180,6 @@ for m in range(1, 34):
         f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
         f'<footer>Luck Habits is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n</body></html>\n')
 print(f"move pages: 33, with stories: {withs}")
-if withs != len(has_story):
-    raise SystemExit(f"story count mismatch: pages {withs}, tile strip {len(has_story)}")
 print(f"noindex: {[m for m in range(1, 34) if m not in has_story]}")
 
 # sitemap.xml: homepage, privacy notice and the move pages that have a story (same set as the tiles).
@@ -182,8 +192,21 @@ pm = re.search(r"Last updated (\d+ \w+ \d{4})", (root / "privacy.html").read_tex
 priv_last = datetime.datetime.strptime(pm.group(1), "%d %B %Y").date().isoformat() if pm else site_last
 urls = [("https://luckhabits.com/", max(site_last, SITE["home_updated"])), ("https://luckhabits.com/privacy.html", priv_last)]
 urls += [(f"https://luckhabits.com/moves/{m}.html", page_last(m)) for m in sorted(has_story)]
-(root / "sitemap.xml").write_text(
+writes[root / "sitemap.xml"] = (
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + "".join(f"  <url><loc>{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls)
     + "</urlset>\n")
-print(f"sitemap.xml: {len(urls)} urls")
+
+# Check before writing anything: a failure leaves every file as it was.
+indexed = {m for m in range(1, 34) if 'name="robots"' not in writes[root / f"moves/{m}.html"]}
+in_sitemap = {int(x) for x in re.findall(r"/moves/(\d+)\.html<", writes[root / "sitemap.xml"])}
+if not (withs == len(has_story) and indexed == has_story == in_sitemap):
+    raise SystemExit(f"story count mismatch: pages {withs}, tile strip {len(has_story)}, "
+                     f"indexed {sorted(indexed ^ has_story)}, sitemap {sorted(in_sitemap ^ has_story)}; nothing written")
+(root / "moves").mkdir(exist_ok=True)
+changed = 0
+for path, text in writes.items():
+    if not path.exists() or path.read_text() != text:
+        path.write_text(text)
+        changed += 1
+print(f"sitemap.xml: {len(urls)} urls; files changed: {changed}")
