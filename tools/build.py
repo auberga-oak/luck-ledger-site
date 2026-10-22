@@ -25,7 +25,7 @@ if latest:
         out.append(
             f'<a class="yt" href="https://youtu.be/{y}" target="_blank" rel="noopener" '
             f'aria-label="Watch Henrik\'s video on luck habit #{L["move"]} on YouTube">'
-            f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="" width="480" height="270" '
+            f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="{e(L.get("youtube_alt") or "Video thumbnail: " + L["title"])}" width="480" height="270" '
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
             f'<span class="ytcap">Watch the video on this luck habit</span></a>'
         )
@@ -99,7 +99,8 @@ tiles = []
 for m in range(1, 34):
     cls = "tile on" if m in covered else ("tile has" if m in storied else "tile")
     tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Luck habit #{m}: {e(MOVES[m-1])}">{m}</a>')
-n_st = len(storied | set(covered))
+has_story = storied | set(covered)
+n_st = len(has_story)
 legend = (f"{n_st} of 33 already have a true, sourced story. Habits #16 to #22 are about risk. Tap a tile with a story to read it."
           if n_st else "Tap a luck habit to see the true stories behind it.")
 key_items = ['<span><i class="sw"></i>No story yet</span>']
@@ -148,13 +149,34 @@ for m in range(1, 34):
         body = '<p class="note">No stories here yet. When we find a true one with a name and a source, it goes here.</p>'
     nav = (f'<a href="{m-1}.html">&larr; Luck habit #{m-1}</a> ' if m > 1 else "") + '<a href="../">All luck habits</a>' + (f' <a href="{m+1}.html">Luck habit #{m+1} &rarr;</a>' if m < 33 else "")
     t = e(MOVES[m-1])
+    # Same test as the tile strip: a page with no story stays out of search results until it gets one.
+    robots = "" if m in has_story else '<meta name="robots" content="noindex, follow">'
     (root / f"moves/{m}.html").write_text(
         f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         f'<title>Luck habit #{m}: {t} | Luck Habits</title><meta name="description" content="True, sourced stories of people who got lucky by doing this: {t}.">'
-        f'<link rel="canonical" href="https://luckhabits.com/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
+        f'{robots}<link rel="canonical" href="https://luckhabits.com/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
         f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Habits</a><span class="tag">luckhabits.com</span></header>'
         f'<main id="main"><section><p class="kicker">Luck habit #{m} of 33</p><h1>{t}</h1>'
         f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}{vbody}'
         f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
         f'<footer>Luck Habits is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>\n</body></html>\n')
 print(f"move pages: 33, with stories: {withs}")
+if withs != len(has_story):
+    raise SystemExit(f"story count mismatch: pages {withs}, tile strip {len(has_story)}")
+print(f"noindex: {[m for m in range(1, 34) if m not in has_story]}")
+
+# sitemap.xml: homepage, privacy notice and the move pages that have a story (same set as the tiles).
+# lastmod comes from the data, so a clean build always gives the same file.
+site_last = max([i["date"] for i in issues] + [x["date"] for x in STORIES])
+def page_last(m):
+    ds = [x["date"] for x in STORIES if x["move"] == m] + [i["date"] for i in issues if i["move"] == m]
+    return max(ds) if ds else site_last
+pm = re.search(r"Last updated (\d+ \w+ \d{4})", (root / "privacy.html").read_text())
+priv_last = datetime.datetime.strptime(pm.group(1), "%d %B %Y").date().isoformat() if pm else site_last
+urls = [("https://luckhabits.com/", site_last), ("https://luckhabits.com/privacy.html", priv_last)]
+urls += [(f"https://luckhabits.com/moves/{m}.html", page_last(m)) for m in sorted(has_story)]
+(root / "sitemap.xml").write_text(
+    '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    + "".join(f"  <url><loc>{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls)
+    + "</urlset>\n")
+print(f"sitemap.xml: {len(urls)} urls")
