@@ -18,7 +18,7 @@ if latest:
     out.append(
         f'<section class="latest reveal" id="issue-{L["number"]}"><p class="kicker">Latest {DOT} Issue #{L["number"]} {DOT} {nice(L["date"])}</p>\n'
         f'<h2>{e(L["title"])}</h2><p>{e(L["teaser"])}</p>\n'
-        f'<p class="move">Luck habit #<span class="count" data-to="{L["move"]}">{L["move"]}</span> of 33: {e(L["move_line"])}</p>'
+        f'<p class="move"><a href="moves/{L["move"]}.html">Luck habit #<span class="count" data-to="{L["move"]}">{L["move"]}</span></a> of 33: {e(L["move_line"])}</p>'
     )
     if L.get("youtube"):
         y = e(L["youtube"])
