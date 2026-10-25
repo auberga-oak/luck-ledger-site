@@ -58,9 +58,11 @@ if earlier:
     for i in earlier:
         out.append(
             f'<li id="issue-{i["number"]}"><b>#{i["number"]} {e(i["title"])}</b> '
-            f'<span class="mv">Luck habit #{i["move"]}</span><br>'
+            f'<a class="mv" href="moves/{i["move"]}.html">Luck habit #{i["move"]}</a><br>'
             f'<span class="note">{nice(i["date"])} {DOT} {e(i["teaser"])} {DOT} '
-            f'<a href="{e(i["source_url"])}">Source</a></span></li>'
+            f'<a href="{e(i["source_url"])}">Source</a>'
+            + (f' {DOT} <a href="https://youtu.be/{e(i["youtube"])}" target="_blank" rel="noopener">Watch on YouTube</a>' if i.get("youtube") else "")
+            + '</span></li>'
         )
     out.append("</ul></section>")
 def load_moves():
@@ -138,32 +140,28 @@ print(f"built {len(issues)} public issue(s); moves covered: {sorted(covered)}")
 # Move pages: the Ledger
 withs = 0
 for m in range(1, 34):
-    ss = sorted([x for x in STORIES if x["move"] == m], key=lambda x: x["date"], reverse=True)
-    if ss: withs += 1
-    if ss:
-        body = "<ul class=\"stories\">" + "".join(
-            f'<li><b>{e(x["name"])}</b>: {e(x["title"])}<br>{e(x["why"])}<br>'
-            f'<span class="note">Source: <a href="{e(x["source_url"])}" rel="noopener">{e(x["source_name"])}</a>, {nice(x["date"])}</span></li>'
-            for x in ss) + "</ul>"
-    vs = [v for v in VIDEOS if v["move"] == m]
-    if vs and not ss: withs += 1
-    if vs:
-        vbody = '<h2>Watch</h2><ul class="stories">' + "".join(
-            f'<li><b>{e(v["title"])}</b><br><a href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">Watch on YouTube</a></li>'
-            for v in vs) + "</ul>"
-    else:
-        vbody = ""
+    # A habit's sent issues always come first, with their video and source, then its stories.
     iss = [i for i in issues if i["move"] == m]
-    if ss:
-        pass
+    ibody = "".join(
+        f'<li><b><a href="../#issue-{i["number"]}">Issue #{i["number"]}</a></b>, {nice(i["date"])}: {e(i["title"])}<br>{e(i["teaser"])}<br>'
+        + (f'<a href="https://youtu.be/{e(i["youtube"])}" target="_blank" rel="noopener">Watch the video on YouTube</a><br>' if i.get("youtube") else "")
+        + f'<span class="note">Source: <a href="{e(i["source_url"])}" rel="noopener">{e(i["source_name"])}</a></span></li>'
+        for i in iss)
+    ss = sorted([x for x in STORIES if x["move"] == m], key=lambda x: x["date"], reverse=True)
+    sbody = "".join(
+        f'<li><b>{e(x["name"])}</b>: {e(x["title"])}<br>{e(x["why"])}<br>'
+        f'<span class="note">Source: <a href="{e(x["source_url"])}" rel="noopener">{e(x["source_name"])}</a>, {nice(x["date"])}</span></li>'
+        for x in ss)
+    vs = [v for v in VIDEOS if v["move"] == m]
+    vbody = ('<h2>Watch</h2><ul class="stories">' + "".join(
+        f'<li><b>{e(v["title"])}</b><br><a href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">Watch on YouTube</a></li>'
+        for v in vs) + "</ul>") if vs else ""
+    if iss or ss or vs:
+        withs += 1
+    if iss or ss:
+        body = f'<ul class="stories">{ibody}{sbody}</ul>'
     elif vs:
         body = ""
-    elif iss:  # a public issue is the only content: list it, linking to it on the homepage
-        withs += 1
-        body = "<ul class=\"stories\">" + "".join(
-            f'<li><b><a href="../#issue-{i["number"]}">Issue #{i["number"]}</a></b>: {e(i["title"])}<br>{e(i["teaser"])}<br>'
-            f'<span class="note">Source: <a href="{e(i["source_url"])}" rel="noopener">{e(i["source_name"])}</a>, {nice(i["date"])}</span></li>'
-            for i in iss) + "</ul>"
     else:
         body = '<p class="note">No stories here yet. When we find a true one with a name and a source, it goes here.</p>'
     nav = (f'<a href="{m-1}.html">&larr; Luck habit #{m-1}</a> ' if m > 1 else "") + '<a href="../">All luck habits</a>' + (f' <a href="{m+1}.html">Luck habit #{m+1} &rarr;</a>' if m < 33 else "")
