@@ -103,7 +103,9 @@ def has_content(m):
 tiles = []
 for m in range(1, 34):
     cls = "tile on" if m in covered else ("tile has" if m in storied else "tile")
-    tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Luck habit #{m}: {e(MOVES[m-1])}">{m}</a>')
+    state = "had its own issue" if m in covered else ("has a true story" if m in storied else "no story yet")
+    tiles.append(f'<a class="{cls}" href="moves/{m}.html" title="Luck habit #{m}: {e(MOVES[m-1])}" '
+                 f'aria-label="Luck habit #{m}: {e(MOVES[m-1])} ({state})">{m}</a>')
 has_story = {m for m in range(1, 34) if has_content(m)}
 n_st = len(has_story)
 legend = (f"{n_st} of 33 already have a true, sourced story. Habits #16 to #22 are about risk. Tap a tile with a story to read it."
@@ -117,7 +119,7 @@ key = f'<p class="note key">{"".join(key_items)}</p>' if len(key_items) > 1 else
 out.append(
     f'<section class="moves reveal"><h2>The 33 luck habits</h2>'
     f'<p class="note">{legend}</p>\n'
-    f'<div class="strip" role="list" aria-label="The 33 luck habits">{"".join(tiles)}</div>'
+    f'<div class="strip" role="group" aria-label="The 33 luck habits">{"".join(tiles)}</div>'
     f'{key}</section>'
 )
 out.extend(vsec)
