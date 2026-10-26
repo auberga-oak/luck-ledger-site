@@ -12,6 +12,8 @@ DOT = "·"
 def nice(d):
     return datetime.date.fromisoformat(d).strftime("%-d %b %Y")
 latest, earlier = (issues[0] if issues else None), issues[1:]
+# One stylesheet version for every page: read it from the homepage head, so bumping it there is enough.
+CSS_V = re.search(r'assets/style\.css\?v=(\w+)"', (root / "index.html").read_text()).group(1)
 out = []
 if latest:
     L = latest
@@ -24,7 +26,7 @@ if latest:
         y = e(L["youtube"])
         out.append(
             f'<a class="yt" href="https://youtu.be/{y}" target="_blank" rel="noopener" '
-            f'aria-label="Watch Henrik\'s video on luck habit #{L["move"]} on YouTube">'
+            f'aria-label="Watch the video on this luck habit: luck habit #{L["move"]}, on YouTube">'
             f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="{e(L.get("youtube_alt") or "Video thumbnail: " + L["title"])}" width="480" height="270" '
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
             f'<span class="ytcap">Watch the video on this luck habit</span></a>'
@@ -174,7 +176,7 @@ for m in range(1, 34):
         f'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">'
         f'<title>Luck habit #{m}: {t} | Luck Habits</title><meta name="description" content="True, sourced stories of people who got lucky by doing this: {t}.">'
         f'{robots}<link rel="canonical" href="https://luckhabits.com/moves/{m}.html"><link rel="icon" href="../favicon.svg" type="image/svg+xml">'
-        f'<link rel="stylesheet" href="../assets/style.css"></head><body><header><a class="logo" href="../">Luck Habits</a><span class="tag">luckhabits.com</span></header>'
+        f'<link rel="stylesheet" href="../assets/style.css?v={CSS_V}"></head><body><header><a class="logo" href="../">Luck Habits</a><span class="tag">luckhabits.com</span></header>'
         f'<main id="main"><section><p class="kicker">Luck habit #{m} of 33</p><h1>{t}</h1>'
         f'<p>Real people who got lucky this way. Each story links to where we read it, so you can check it yourself.</p>{body}{vbody}'
         f'<p class="note">{nav}</p><p><a href="../#signup">Get one story like this every Sunday</a></p></section></main>'
@@ -192,6 +194,10 @@ pm = re.search(r"Last updated (\d+ \w+ \d{4})", (root / "privacy.html").read_tex
 priv_last = datetime.datetime.strptime(pm.group(1), "%d %B %Y").date().isoformat() if pm else site_last
 urls = [("https://luckhabits.com/", max(site_last, SITE["home_updated"])), ("https://luckhabits.com/privacy.html", priv_last)]
 urls += [(f"https://luckhabits.com/moves/{m}.html", page_last(m)) for m in sorted(has_story)]
+# Static pages share the homepage's stylesheet version, so they also get fresh CSS after a change.
+for name in ("privacy.html", "404.html"):
+    sp = root / name
+    writes[sp] = re.sub(r'(assets/style\.css)(\?v=\w+)?"', rf'\1?v={CSS_V}"', sp.read_text())
 writes[root / "sitemap.xml"] = (
     '<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
     + "".join(f"  <url><loc>{u}</loc><lastmod>{d}</lastmod></url>\n" for u, d in urls)
