@@ -49,5 +49,5 @@ document.getElementById('signup').addEventListener('submit',async e=>{e.preventD
 try{const r=await fetch(f.action,{method:'POST',body:new FormData(f),headers:{Accept:'application/json'}});const j=await r.json();
 if(j.status==='success'){f.hidden=true;m.innerHTML='<b>Almost done. Check your inbox</b> and click the confirm link. (Look in spam if it isn\'t there in a minute.)';}
 else if(j.url){window.location=j.url;}else throw 0;}catch(_){f.submit();}});
-</script><script src="assets/motion.js" defer></script><footer><a class="quiet" href="https://overwise.gumroad.com/l/moreluck" target="_blank" rel="noopener">Get all 33 luck habits</a><br>Luck Habits is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
+</script><script src="assets/motion.js" defer></script><footer><a class="quiet" href="https://overwise.gumroad.com/l/moreluck" target="_blank" rel="noopener">Get all 33 luck habits</a> · <a class="quiet" href="privacy.html">Privacy notice</a><br>Luck Habits is written by Henrik Ekenberg in Stockholm. © 2026 Finansium AB</footer><script data-goatcounter="https://luckledger.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>
