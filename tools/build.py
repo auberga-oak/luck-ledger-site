@@ -36,7 +36,7 @@ if latest:
     d0 = datetime.date.fromisoformat(L["date"])
     nd = d0 + datetime.timedelta(days=(6 - d0.weekday()) % 7 or 7)  # next Sunday after the latest issue
     nsend = datetime.datetime.combine(nd, datetime.time(8, 0), tzinfo=STHLM)
-    nxt = nsend.strftime("%A %-d %b at %H:%M")
+    nxt = nsend.strftime("%A %-d %b at %H:%M") + " Stockholm time"
     out.append(
         f'<p class="note">Source: <a href="{e(L["source_url"])}">{e(L["source_name"])}</a></p>\n'
         f'<p class="note nextup">Next story: {nxt}. <a href="#signup">Get it by email</a>, free.</p></section>'
