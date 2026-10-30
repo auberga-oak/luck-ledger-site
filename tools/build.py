@@ -62,7 +62,7 @@ if earlier:
             f'<li id="issue-{i["number"]}"><b>#{i["number"]} {e(i["title"])}</b> '
             f'<a class="mv" href="moves/{i["move"]}.html">Luck habit #{i["move"]}</a><br>'
             f'<span class="note">{nice(i["date"])} {DOT} {e(i["teaser"])} {DOT} '
-            f'<a href="{e(i["source_url"])}">Source</a>'
+            f'Source: <a href="{e(i["source_url"])}">{e(i["source_name"])}</a>'
             + (f' {DOT} <a href="https://youtu.be/{e(i["youtube"])}" target="_blank" rel="noopener">Watch on YouTube</a>' if i.get("youtube") else "")
             + '</span></li>'
         )
