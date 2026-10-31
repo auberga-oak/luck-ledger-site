@@ -93,7 +93,7 @@ if VIDEOS:
         f'<li><a class="vthumb" href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">'
         f'<img src="https://i.ytimg.com/vi/{e(v["id"])}/hqdefault.jpg" alt="{e(v["alt"])}" width="480" height="270" loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span></a>'
         f'<b>{e(v["title"])}</b>'
-        f'<span class="note"><a class="mv" href="moves/{v["move"]}.html">Luck habit #{v["move"]}</a> {DOT} '
+        f'<span class="note"><a class="mv" href="moves/{v["move"]}.html">Luck habit #{v["move"]}: {e(MOVES[v["move"]-1])}</a> {DOT} '
         f'<a href="https://youtu.be/{e(v["id"])}" target="_blank" rel="noopener">Watch on YouTube</a></span></li>'
         for v in VIDEOS) + '</ul></section>')
 covered = {i["move"]: i["number"] for i in issues}
