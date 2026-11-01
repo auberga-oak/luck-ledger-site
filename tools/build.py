@@ -48,7 +48,7 @@ if latest:
         out.append(
             f'<a class="yt" href="https://youtu.be/{y}" target="_blank" rel="noopener" '
             f'aria-label="Watch the video on this luck habit: luck habit #{L["move"]}, on YouTube">'
-            f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="{e(L.get("youtube_alt") or "Video thumbnail: " + L["title"])}" width="480" height="270" '
+            f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="{e(L.get("youtube_alt") or "Video: " + L["title"])}" width="480" height="270" '
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
             f'<span class="ytcap">Watch the video on this luck habit</span></a>'
         )
