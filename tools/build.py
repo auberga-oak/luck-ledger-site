@@ -14,6 +14,27 @@ def nice(d):
 latest, earlier = (issues[0] if issues else None), issues[1:]
 # One stylesheet version for every page: read it from the homepage head, so bumping it there is enough.
 CSS_V = re.search(r'assets/style\.css\?v=(\w+)"', (root / "index.html").read_text()).group(1)
+def load_moves():
+    """moves.md is local only (not committed). On a clean checkout fall back to the
+    habit names already in the committed moves/N.html pages."""
+    src = root / "moves.md"
+    if src.exists():
+        return [re.sub(r"^\d+\.\s*", "", l).strip() for l in src.read_text().splitlines() if re.match(r"^\d+\.", l)]
+    names = []
+    for m in range(1, 34):
+        mp = root / f"moves/{m}.html"
+        h = re.search(r"<h1>(.*?)</h1>", mp.read_text(), re.S) if mp.exists() else None
+        if not h:
+            raise SystemExit(f"moves.md missing and moves/{m}.html has no habit name; cannot build")
+        names.append(html.unescape(h.group(1)))
+    print("moves.md not found, using habit names from committed moves pages")
+    return names
+MOVES = load_moves()
+if len(MOVES) != 33:
+    raise SystemExit(f"expected 33 habit names, found {len(MOVES)}; cannot build")
+for n, name in enumerate(MOVES, 1):
+    if not name.strip():
+        raise SystemExit(f"habit #{n} has an empty name (check moves.md or moves/{n}.html); cannot build")
 out = []
 if latest:
     L = latest
@@ -60,29 +81,13 @@ if earlier:
     for i in earlier:
         out.append(
             f'<li id="issue-{i["number"]}"><b>#{i["number"]} {e(i["title"])}</b> '
-            f'<a class="mv" href="moves/{i["move"]}.html">Luck habit #{i["move"]}</a><br>'
+            f'<a class="mv" href="moves/{i["move"]}.html">Luck habit #{i["move"]}: {e(MOVES[i["move"]-1])}</a><br>'
             f'<span class="note">{nice(i["date"])} {DOT} {e(i["teaser"])} {DOT} '
             f'Source: <a href="{e(i["source_url"])}">{e(i["source_name"])}</a>'
             + (f' {DOT} <a href="https://youtu.be/{e(i["youtube"])}" target="_blank" rel="noopener">Watch on YouTube</a>' if i.get("youtube") else "")
             + '</span></li>'
         )
     out.append("</ul></section>")
-def load_moves():
-    """moves.md is local only (not committed). On a clean checkout fall back to the
-    habit names already in the committed moves/N.html pages."""
-    src = root / "moves.md"
-    if src.exists():
-        return [re.sub(r"^\d+\.\s*", "", l).strip() for l in src.read_text().splitlines() if re.match(r"^\d+\.", l)]
-    names = []
-    for m in range(1, 34):
-        mp = root / f"moves/{m}.html"
-        h = re.search(r"<h1>(.*?)</h1>", mp.read_text(), re.S) if mp.exists() else None
-        if not h:
-            raise SystemExit(f"moves.md missing and moves/{m}.html has no habit name; cannot build")
-        names.append(html.unescape(h.group(1)))
-    print("moves.md not found, using habit names from committed moves pages")
-    return names
-MOVES = load_moves()
 STORIES = json.load(open(root / "data/stories.json"))
 VIDEOS = json.load(open(root / "data/videos.json"))
 vsec = []
