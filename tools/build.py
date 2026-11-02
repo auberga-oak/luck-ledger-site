@@ -35,6 +35,15 @@ if len(MOVES) != 33:
 for n, name in enumerate(MOVES, 1):
     if not name.strip():
         raise SystemExit(f"habit #{n} has an empty name (check moves.md or moves/{n}.html); cannot build")
+def need(rec, keys, where):
+    """Stop the build if a field the page shows is missing, empty or only spaces,
+    so it can never publish an empty link or an image with no accessible name."""
+    for k in keys:
+        v = rec.get(k)
+        if not isinstance(v, str) or not v.strip():
+            raise SystemExit(f"{where} has an empty or missing {k}; cannot build")
+for i in issues:
+    need(i, ("source_name", "source_url"), f"data/issues.json issue #{i.get('number')}")
 out = []
 if latest:
     L = latest
@@ -90,6 +99,10 @@ if earlier:
     out.append("</ul></section>")
 STORIES = json.load(open(root / "data/stories.json"))
 VIDEOS = json.load(open(root / "data/videos.json"))
+for x in STORIES:
+    need(x, ("source_name", "source_url"), f"data/stories.json story on habit #{x.get('move')}")
+for v in VIDEOS:
+    need(v, ("id", "alt", "title"), f"data/videos.json video on habit #{v.get('move')}")
 vsec = []
 if VIDEOS:
     vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
