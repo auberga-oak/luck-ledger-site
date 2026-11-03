@@ -55,8 +55,8 @@ if latest:
     if L.get("youtube"):
         y = e(L["youtube"])
         out.append(
-            f'<a class="yt" href="https://youtu.be/{y}" target="_blank" rel="noopener" '
-            f'aria-label="Watch the video on this luck habit: luck habit #{L["move"]}, on YouTube">'
+            # No aria-label: it would hide the img alt. The link's name is the alt plus the caption.
+            f'<a class="yt" href="https://youtu.be/{y}" target="_blank" rel="noopener">'
             f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="{e(L.get("youtube_alt") or "Video: " + L["title"])}" width="480" height="270" '
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
             f'<span class="ytcap">Watch the video on this luck habit</span></a>'
