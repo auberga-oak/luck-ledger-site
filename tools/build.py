@@ -102,7 +102,12 @@ VIDEOS = json.load(open(root / "data/videos.json"))
 for x in STORIES:
     need(x, ("source_name", "source_url"), f"data/stories.json story on habit #{x.get('move')}")
 for v in VIDEOS:
-    need(v, ("id", "alt", "title"), f"data/videos.json video on habit #{v.get('move')}")
+    need(v, ("id", "alt", "title", "added"), f"data/videos.json video on habit #{v.get('move')}")
+    # "added" is the day the video went on the site; it is the sitemap lastmod for video-only habit pages.
+    try:
+        datetime.date.fromisoformat(v["added"])
+    except ValueError:
+        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={v['added']!r}, not YYYY-MM-DD; cannot build")
 vsec = []
 if VIDEOS:
     vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
@@ -206,7 +211,9 @@ print(f"noindex: {[m for m in range(1, 34) if m not in has_story]}")
 # lastmod comes from the data, so a clean build always gives the same file.
 site_last = max([i["date"] for i in issues] + [x["date"] for x in STORIES])
 def page_last(m):
-    ds = [x["date"] for x in STORIES if x["move"] == m] + [i["date"] for i in issues if i["move"] == m]
+    # Each habit page's own newest date: its stories, its sent issues and the videos it lists.
+    ds = ([x["date"] for x in STORIES if x["move"] == m] + [i["date"] for i in issues if i["move"] == m]
+          + [v["added"] for v in VIDEOS if v["move"] == m])
     return max(ds) if ds else site_last
 pm = re.search(r"Last updated (\d+ \w+ \d{4})", (root / "privacy.html").read_text())
 priv_last = datetime.datetime.strptime(pm.group(1), "%d %B %Y").date().isoformat() if pm else site_last
