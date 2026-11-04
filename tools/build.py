@@ -104,10 +104,15 @@ for x in STORIES:
 for v in VIDEOS:
     need(v, ("id", "alt", "title", "added"), f"data/videos.json video on habit #{v.get('move')}")
     # "added" is the day the video went on the site; it is the sitemap lastmod for video-only habit pages.
+    a = v["added"]
     try:
-        datetime.date.fromisoformat(v["added"])
+        if not (isinstance(a, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", a)):
+            raise ValueError
+        ad = datetime.date.fromisoformat(a)
     except ValueError:
-        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={v['added']!r}, not YYYY-MM-DD; cannot build")
+        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, not YYYY-MM-DD; cannot build")
+    if ad > datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date():
+        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, later than today; cannot build")
 vsec = []
 if VIDEOS:
     vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
