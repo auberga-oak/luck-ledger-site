@@ -101,6 +101,8 @@ STORIES = json.load(open(root / "data/stories.json"))
 VIDEOS = json.load(open(root / "data/videos.json"))
 for x in STORIES:
     need(x, ("source_name", "source_url"), f"data/stories.json story on habit #{x.get('move')}")
+# Floor for video "added" dates: the site went live on 2026-10-13 (see site-improvements.md).
+SITE_LAUNCH = datetime.date(2026, 10, 13)
 for v in VIDEOS:
     need(v, ("id", "alt", "title", "added"), f"data/videos.json video on habit #{v.get('move')}")
     # "added" is the day the video went on the site; it is the sitemap lastmod for video-only habit pages.
@@ -113,6 +115,8 @@ for v in VIDEOS:
         raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, not YYYY-MM-DD; cannot build")
     if ad > datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date():
         raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, later than today; cannot build")
+    if ad < SITE_LAUNCH:
+        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, before site launch {SITE_LAUNCH.isoformat()}; cannot build")
 vsec = []
 if VIDEOS:
     vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
