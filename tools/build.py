@@ -54,11 +54,16 @@ if latest:
     )
     if L.get("youtube"):
         y = e(L["youtube"])
+        alt = L.get("youtube_alt") or ("Video: " + L["title"])
+        if not alt.endswith("."):
+            alt = alt + "."
         out.append(
-            # No aria-label: it would hide the img alt. The link's name is the alt plus the caption.
+            # No aria-label: it would hide the img alt. The link's name is the alt, the
+            # visually hidden YouTube hint, and the visible caption.
             f'<a class="yt" href="https://youtu.be/{y}" target="_blank" rel="noopener">'
-            f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="{e(L.get("youtube_alt") or "Video: " + L["title"])}" width="480" height="270" '
+            f'<img src="https://i.ytimg.com/vi/{y}/hqdefault.jpg" alt="{e(alt)}" width="480" height="270" '
             f'loading="lazy" decoding="async"><span class="play" aria-hidden="true"></span>'
+            f'<span class="sr-only">(YouTube, opens in a new tab)</span>'
             f'<span class="ytcap">Watch the video on this luck habit</span></a>'
         )
     # Rule: a new issue goes out every Sunday at 08:00 Stockholm local time (DST aware).
