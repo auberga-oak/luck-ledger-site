@@ -42,6 +42,8 @@ def need(rec, keys, where):
         v = rec.get(k)
         if not isinstance(v, str) or not v.strip():
             raise SystemExit(f"{where} has an empty or missing {k}; cannot build")
+        if k.endswith("_url") and (not v.startswith("https://") or len(v.strip()) <= len("https://")):
+            raise SystemExit(f"{where} has {k}={v!r}, which is not a full https:// link; cannot build")
 for i in issues:
     need(i, ("source_name", "source_url"), f"data/issues.json issue #{i.get('number')}")
 out = []
