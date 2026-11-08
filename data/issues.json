@@ -38,5 +38,19 @@
     "source_date": "2026-07-14",
     "youtube": "Kr691yc7agA",
     "youtube_alt": "Video: Joël Lapointe and the meteor crater he spotted while looking for a campsite."
+  },
+  {
+    "number": 4,
+    "title": "\"We burned all of it\"",
+    "move": 2,
+    "move_line": "Kill the dead ones fast.",
+    "teaser": "Melius scrapped more than six months of code and bet on a new product.",
+    "date": "2026-11-08",
+    "public": true,
+    "source_name": "TechCrunch",
+    "source_url": "https://techcrunch.com/2026/10/06/ex-ramp-engineers-raise-20m-for-platform-melius-after-scrapping-their-first-product/",
+    "source_date": "2026-10-06",
+    "youtube": "NB-h703Rsd4",
+    "youtube_alt": "Video: Melius's founders, who scrapped more than six months of code and started over."
   }
 ]
