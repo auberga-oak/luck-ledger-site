@@ -35,15 +35,24 @@ if len(MOVES) != 33:
 for n, name in enumerate(MOVES, 1):
     if not name.strip():
         raise SystemExit(f"habit #{n} has an empty name (check moves.md or moves/{n}.html); cannot build")
+# Zero-width characters that look empty but pass str.strip() (Kent, 2 Nov 2026).
+_ZW = dict.fromkeys(map(ord, "\u200b\u200c\u200d\ufeff\u2060"))
+def without_zw(s):
+    """Remove zero-width characters so a name made only of them counts as empty."""
+    return s.translate(_ZW)
+errors = []
 def need(rec, keys, where):
-    """Stop the build if a field the page shows is missing, empty or only spaces,
-    so it can never publish an empty link or an image with no accessible name."""
+    """Collect an error if a field the page shows is missing, empty, only spaces
+    or only zero-width characters, so the build can never publish an empty link
+    or an image with no accessible name. Every bad field is reported together."""
     for k in keys:
         v = rec.get(k)
-        if not isinstance(v, str) or not v.strip():
-            raise SystemExit(f"{where} has an empty or missing {k}; cannot build")
-        if k.endswith("_url") and (not v.startswith("https://") or len(v.strip()) <= len("https://")):
-            raise SystemExit(f"{where} has {k}={v!r}, which is not a full https:// link; cannot build")
+        cleaned = without_zw(v) if isinstance(v, str) else ""
+        if not isinstance(v, str) or not cleaned.strip():
+            errors.append(f"{where} has an empty or missing {k}; cannot build")
+            continue
+        if k.endswith("_url") and (not cleaned.startswith("https://") or len(cleaned.strip()) <= len("https://")):
+            errors.append(f"{where} has {k}={v!r}, which is not a full https:// link; cannot build")
 for i in issues:
     need(i, ("source_name", "source_url"), f"data/issues.json issue #{i.get('number')}")
 out = []
@@ -111,19 +120,25 @@ for x in STORIES:
 # Floor for video "added" dates: the site went live on 2026-10-13 (see site-improvements.md).
 SITE_LAUNCH = datetime.date(2026, 10, 13)
 for v in VIDEOS:
-    need(v, ("id", "alt", "title", "added"), f"data/videos.json video on habit #{v.get('move')}")
+    where = f"data/videos.json video on habit #{v.get('move')}"
+    need(v, ("id", "alt", "title", "added"), where)
     # "added" is the day the video went on the site; it is the sitemap lastmod for video-only habit pages.
-    a = v["added"]
+    a = v.get("added")
+    if not isinstance(a, str) or not without_zw(a).strip():
+        continue
     try:
-        if not (isinstance(a, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", a)):
+        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", a):
             raise ValueError
         ad = datetime.date.fromisoformat(a)
     except ValueError:
-        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, not YYYY-MM-DD; cannot build")
+        errors.append(f"{where} has added={a!r}, not YYYY-MM-DD; cannot build")
+        continue
     if ad > datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date():
-        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, later than today; cannot build")
-    if ad < SITE_LAUNCH:
-        raise SystemExit(f"data/videos.json video on habit #{v.get('move')} has added={a!r}, before site launch {SITE_LAUNCH.isoformat()}; cannot build")
+        errors.append(f"{where} has added={a!r}, later than today; cannot build")
+    elif ad < SITE_LAUNCH:
+        errors.append(f"{where} has added={a!r}, before site launch {SITE_LAUNCH.isoformat()}; cannot build")
+if errors:
+    raise SystemExit("\n".join(errors))
 vsec = []
 if VIDEOS:
     vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
