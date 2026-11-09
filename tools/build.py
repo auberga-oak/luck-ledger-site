@@ -51,7 +51,8 @@ def need(rec, keys, where):
         if not isinstance(v, str) or not cleaned.strip():
             errors.append(f"{where} has an empty or missing {k}; cannot build")
             continue
-        if k.endswith("_url") and (not cleaned.startswith("https://") or len(cleaned.strip()) <= len("https://")):
+        # Check the raw value: a hidden zero-width character or a space inside a link would go straight into the href.
+        if k.endswith("_url") and (cleaned != v or any(c.isspace() for c in v) or not v.startswith("https://") or len(v) <= len("https://")):
             errors.append(f"{where} has {k}={v!r}, which is not a full https:// link; cannot build")
 for i in issues:
     need(i, ("source_name", "source_url"), f"data/issues.json issue #{i.get('number')}")
