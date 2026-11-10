@@ -2,11 +2,12 @@
 """Render issue sections into index.html from data/issues.json.
 Only issues with public:true are shown (flip after the Kit broadcast goes out).
 Keep unpublished drafts OUT of issues.json (the repo is public), or leave public:false."""
+import urllib.parse
 import json, html, re, datetime, pathlib
 from zoneinfo import ZoneInfo
 root = pathlib.Path(__file__).resolve().parent.parent
 issues = [i for i in json.load(open(root / "data/issues.json")) if i.get("public") is True]
-issues.sort(key=lambda i: i["number"], reverse=True)
+issues.sort(key=lambda i: i["number"] if type(i.get("number")) is int else -1, reverse=True)
 e = html.escape
 DOT = "·"
 def nice(d):
@@ -41,6 +42,23 @@ def without_zw(s):
     """Remove zero-width characters so a name made only of them counts as empty."""
     return s.translate(_ZW)
 errors = []
+_HOST = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}")
+def good_https(v):
+    """A real https link: scheme https, a host name with a dot, no user part, and a valid port if one is given."""
+    try:
+        u = urllib.parse.urlsplit(v)
+        port = u.port
+    except ValueError:
+        return False
+    if u.scheme != "https" or not v.startswith("https://") or "@" in u.netloc:
+        return False
+    if not u.hostname or not _HOST.fullmatch(u.hostname):
+        return False
+    if port is not None and not 1 <= port <= 65535:
+        return False
+    if u.netloc.endswith(":"):
+        return False
+    return not any(ord(c) < 32 or ord(c) == 127 for c in v)
 def need(rec, keys, where):
     """Collect an error if a field the page shows is missing, empty, only spaces
     or only zero-width characters, so the build can never publish an empty link
@@ -52,10 +70,52 @@ def need(rec, keys, where):
             errors.append(f"{where} has an empty or missing {k}; cannot build")
             continue
         # Check the raw value: a hidden zero-width character or a space inside a link would go straight into the href.
-        if k.endswith("_url") and (cleaned != v or any(c.isspace() for c in v) or not v.startswith("https://") or len(v) <= len("https://")):
+        if k.endswith("_url") and (cleaned != v or any(c.isspace() for c in v) or not good_https(v)):
             errors.append(f"{where} has {k}={v!r}, which is not a full https:// link; cannot build")
 for i in issues:
-    need(i, ("source_name", "source_url"), f"data/issues.json issue #{i.get('number')}")
+    where = f"data/issues.json issue #{i.get('number')}"
+    need(i, ("title", "teaser", "move_line", "date", "source_name", "source_url"), where)
+    for k in ("number", "move"):
+        if type(i.get(k)) is not int or (k == "move" and not 1 <= i[k] <= 33):
+            errors.append(f"{where} has {k}={i.get(k)!r}, which is not a whole number{' from 1 to 33' if k == 'move' else ''}; cannot build")
+    d = i.get("date")
+    if isinstance(d, str) and without_zw(d).strip():
+        try:
+            if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", d):
+                raise ValueError
+            datetime.date.fromisoformat(d)
+        except ValueError:
+            errors.append(f"{where} has date={d!r}, not YYYY-MM-DD; cannot build")
+    for k in ("youtube", "youtube_alt"):
+        if k in i and i[k] is not None and not isinstance(i[k], str):
+            errors.append(f"{where} has {k}={i[k]!r}, which is not text; cannot build")
+# Validate every record before rendering anything, so a missing or non-string field is reported, never a crash (Kent, 8 Nov 2026).
+STORIES = json.load(open(root / "data/stories.json"))
+VIDEOS = json.load(open(root / "data/videos.json"))
+for x in STORIES:
+    need(x, ("source_name", "source_url"), f"data/stories.json story on habit #{x.get('move')}")
+# Floor for video "added" dates: the site went live on 2026-10-13 (see site-improvements.md).
+SITE_LAUNCH = datetime.date(2026, 10, 13)
+for v in VIDEOS:
+    where = f"data/videos.json video on habit #{v.get('move')}"
+    need(v, ("id", "alt", "title", "added"), where)
+    # "added" is the day the video went on the site; it is the sitemap lastmod for video-only habit pages.
+    a = v.get("added")
+    if not isinstance(a, str) or not without_zw(a).strip():
+        continue
+    try:
+        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", a):
+            raise ValueError
+        ad = datetime.date.fromisoformat(a)
+    except ValueError:
+        errors.append(f"{where} has added={a!r}, not YYYY-MM-DD; cannot build")
+        continue
+    if ad > datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date():
+        errors.append(f"{where} has added={a!r}, later than today; cannot build")
+    elif ad < SITE_LAUNCH:
+        errors.append(f"{where} has added={a!r}, before site launch {SITE_LAUNCH.isoformat()}; cannot build")
+if errors:
+    raise SystemExit("\n".join(errors))
 out = []
 if latest:
     L = latest
@@ -114,32 +174,6 @@ if earlier:
             + '</span></li>'
         )
     out.append("</ul></section>")
-STORIES = json.load(open(root / "data/stories.json"))
-VIDEOS = json.load(open(root / "data/videos.json"))
-for x in STORIES:
-    need(x, ("source_name", "source_url"), f"data/stories.json story on habit #{x.get('move')}")
-# Floor for video "added" dates: the site went live on 2026-10-13 (see site-improvements.md).
-SITE_LAUNCH = datetime.date(2026, 10, 13)
-for v in VIDEOS:
-    where = f"data/videos.json video on habit #{v.get('move')}"
-    need(v, ("id", "alt", "title", "added"), where)
-    # "added" is the day the video went on the site; it is the sitemap lastmod for video-only habit pages.
-    a = v.get("added")
-    if not isinstance(a, str) or not without_zw(a).strip():
-        continue
-    try:
-        if not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", a):
-            raise ValueError
-        ad = datetime.date.fromisoformat(a)
-    except ValueError:
-        errors.append(f"{where} has added={a!r}, not YYYY-MM-DD; cannot build")
-        continue
-    if ad > datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date():
-        errors.append(f"{where} has added={a!r}, later than today; cannot build")
-    elif ad < SITE_LAUNCH:
-        errors.append(f"{where} has added={a!r}, before site launch {SITE_LAUNCH.isoformat()}; cannot build")
-if errors:
-    raise SystemExit("\n".join(errors))
 vsec = []
 if VIDEOS:
     vsec.append('<section class="videos reveal"><h2>Watch the stories</h2>'
