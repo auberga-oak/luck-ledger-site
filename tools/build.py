@@ -37,14 +37,14 @@ for n, name in enumerate(MOVES, 1):
     if not name.strip():
         raise SystemExit(f"habit #{n} has an empty name (check moves.md or moves/{n}.html); cannot build")
 # Zero-width characters that look empty but pass str.strip() (Kent, 2 Nov 2026).
-_ZW = dict.fromkeys(map(ord, "\u200b\u200c\u200d\ufeff\u2060"))
+_ZW = dict.fromkeys(map(ord, "\u200b\u200c\u200d\ufeff\u2060\u00ad\u180e"))
 def without_zw(s):
     """Remove zero-width characters so a name made only of them counts as empty."""
     return s.translate(_ZW)
 errors = []
 _HOST = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}")
 def good_https(v):
-    """A real https link: scheme https, a host name with a dot, no user part, and a valid port if one is given."""
+    """A real https link (no quote, angle bracket, backtick or backslash): scheme https, a host name with a dot, no user part, and a valid port if one is given."""
     try:
         u = urllib.parse.urlsplit(v)
         port = u.port
@@ -58,7 +58,7 @@ def good_https(v):
         return False
     if u.netloc.endswith(":"):
         return False
-    return not any(ord(c) < 32 or ord(c) == 127 for c in v)
+    return not any(ord(c) < 32 or ord(c) == 127 or c in "\"'<>`\\" for c in v)
 def need(rec, keys, where):
     """Collect an error if a field the page shows is missing, empty, only spaces
     or only zero-width characters, so the build can never publish an empty link
