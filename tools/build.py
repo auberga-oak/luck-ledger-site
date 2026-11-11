@@ -2,6 +2,7 @@
 """Render issue sections into index.html from data/issues.json.
 Only issues with public:true are shown (flip after the Kit broadcast goes out).
 Keep unpublished drafts OUT of issues.json (the repo is public), or leave public:false."""
+import unicodedata
 import urllib.parse
 import json, html, re, datetime, pathlib
 from zoneinfo import ZoneInfo
@@ -36,11 +37,16 @@ if len(MOVES) != 33:
 for n, name in enumerate(MOVES, 1):
     if not name.strip():
         raise SystemExit(f"habit #{n} has an empty name (check moves.md or moves/{n}.html); cannot build")
-# Zero-width characters that look empty but pass str.strip() (Kent, 2 Nov 2026).
-_ZW = dict.fromkeys(map(ord, "\u200b\u200c\u200d\ufeff\u2060\u00ad\u180e"))
+# Hidden characters that look empty but pass str.strip() (Kent, 2 and 10 Nov 2026):
+# every Unicode format (Cf) character, the Hangul fillers and the variation selectors.
+_HIDDEN_EXTRA = {0x115F, 0x1160, 0x3164, 0xFFA0}
+def is_hidden(c):
+    o = ord(c)
+    return (unicodedata.category(c) == "Cf" or o in _HIDDEN_EXTRA
+            or 0xFE00 <= o <= 0xFE0F or 0xE0100 <= o <= 0xE01EF)
 def without_zw(s):
-    """Remove zero-width characters so a name made only of them counts as empty."""
-    return s.translate(_ZW)
+    """Remove hidden characters so a name made only of them counts as empty."""
+    return "".join(c for c in s if not is_hidden(c))
 errors = []
 _HOST = re.compile(r"(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}")
 def good_https(v):
