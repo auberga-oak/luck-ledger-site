@@ -38,8 +38,8 @@ for n, name in enumerate(MOVES, 1):
     if not name.strip():
         raise SystemExit(f"habit #{n} has an empty name (check moves.md or moves/{n}.html); cannot build")
 # Hidden characters that look empty but pass str.strip() (Kent, 2 and 10 Nov 2026):
-# every Unicode format (Cf) character, the Hangul fillers and the variation selectors.
-_HIDDEN_EXTRA = {0x115F, 0x1160, 0x3164, 0xFFA0}
+# every Unicode format (Cf) character, the Hangul fillers, the Khmer inherent vowels (U+17B4, U+17B5), the combining grapheme joiner (U+034F) and the variation selectors.
+_HIDDEN_EXTRA = {0x115F, 0x1160, 0x3164, 0xFFA0, 0x034F, 0x17B4, 0x17B5}
 def is_hidden(c):
     o = ord(c)
     return (unicodedata.category(c) == "Cf" or o in _HIDDEN_EXTRA
