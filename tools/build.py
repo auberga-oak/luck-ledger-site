@@ -100,8 +100,14 @@ STORIES = json.load(open(root / "data/stories.json"))
 VIDEOS = json.load(open(root / "data/videos.json"))
 for x in STORIES:
     need(x, ("source_name", "source_url"), f"data/stories.json story on habit #{x.get('move')}")
-# Floor for video "added" dates: the site went live on 2026-10-13 (see site-improvements.md).
-SITE_LAUNCH = datetime.date(2026, 10, 13)
+# Floor for video "added" dates: the site launch day, kept in data/site.json as "site_launch" (YYYY-MM-DD; 2026-10-13, see site-improvements.md).
+_launch = json.load(open(root / "data/site.json")).get("site_launch")
+try:
+    if not isinstance(_launch, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", _launch):
+        raise ValueError
+    SITE_LAUNCH = datetime.date.fromisoformat(_launch)
+except ValueError:
+    raise SystemExit(f"data/site.json has site_launch={_launch!r}, not YYYY-MM-DD; cannot build")
 for v in VIDEOS:
     where = f"data/videos.json video on habit #{v.get('move')}"
     need(v, ("id", "alt", "title", "added"), where)
