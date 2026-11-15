@@ -30,14 +30,14 @@
     "title": "He was looking for a campsite",
     "move": 24,
     "move_line": "Do not stare so hard that you miss the notice.",
-    "teaser": "Joël Lapointe was looking for a campsite and found a meteor crater.",
+    "teaser": "Jo\u00ebl Lapointe was looking for a campsite and found a meteor crater.",
     "date": "2026-11-01",
     "public": true,
     "source_name": "CBC News",
     "source_url": "https://www.cbc.ca/news/canada/montreal/meteor-crater-quebec-discovery-390-million-years-old-9.7268583",
     "source_date": "2026-07-14",
     "youtube": "Kr691yc7agA",
-    "youtube_alt": "Video: Joël Lapointe and the meteor crater he spotted while looking for a campsite."
+    "youtube_alt": "Video: Jo\u00ebl Lapointe and the meteor crater he spotted while looking for a campsite."
   },
   {
     "number": 4,
@@ -52,5 +52,19 @@
     "source_date": "2026-10-06",
     "youtube": "NB-h703Rsd4",
     "youtube_alt": "Video: Melius's founders, who scrapped more than six months of code and started over."
+  },
+  {
+    "number": 5,
+    "title": "Kobe's 10 rules, and the luck between them",
+    "move": 5,
+    "move_line": "Do the work, and tell people.",
+    "teaser": "Most of the famous list is about hard work. Five of the rules are about something else. They're about getting more chances.",
+    "date": "2026-11-15",
+    "public": true,
+    "source_name": "ESPN",
+    "source_url": "https://www.espn.com/nfl/story/_/id/29548861/eagles-honor-kobe-bryant-practice-facility-mural",
+    "source_date": "2020-07-27",
+    "youtube": "J24wsLLiGgU",
+    "youtube_alt": "Video: Salani Gunarathne."
   }
 ]
