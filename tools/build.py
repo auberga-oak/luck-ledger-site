@@ -101,7 +101,15 @@ VIDEOS = json.load(open(root / "data/videos.json"))
 for x in STORIES:
     need(x, ("source_name", "source_url"), f"data/stories.json story on habit #{x.get('move')}")
 # Floor for video "added" dates: the site launch day, kept in data/site.json as "site_launch" (YYYY-MM-DD; 2026-10-13, see site-improvements.md).
-_launch = json.load(open(root / "data/site.json")).get("site_launch")
+try:
+    _site_data = json.load(open(root / "data/site.json"))
+except FileNotFoundError:
+    raise SystemExit("data/site.json is missing; cannot build")
+except (json.JSONDecodeError, UnicodeDecodeError) as e:
+    raise SystemExit(f"data/site.json is not valid JSON ({e}); cannot build")
+if not isinstance(_site_data, dict):
+    raise SystemExit("data/site.json must be a JSON object; cannot build")
+_launch = _site_data.get("site_launch")
 try:
     if not isinstance(_launch, str) or not re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", _launch):
         raise ValueError
