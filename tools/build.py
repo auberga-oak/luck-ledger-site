@@ -116,6 +116,8 @@ try:
     SITE_LAUNCH = datetime.date.fromisoformat(_launch)
 except ValueError:
     raise SystemExit(f"data/site.json has site_launch={_launch!r}, not YYYY-MM-DD; cannot build")
+if SITE_LAUNCH > datetime.datetime.now(ZoneInfo("Europe/Stockholm")).date():
+    raise SystemExit(f"data/site.json site_launch {_launch} is in the future; cannot build")
 for v in VIDEOS:
     where = f"data/videos.json video on habit #{v.get('move')}"
     need(v, ("id", "alt", "title", "added"), where)
